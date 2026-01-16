@@ -1,0 +1,47 @@
+/**
+ * index.css
+ * Styles globaux
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Couleurs principales */
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #1a1f2e;
+  --bg-tertiary: #252b3d;
+  
+  /* Couleurs d'accent */
+  --accent-gold: #d4af37;
+  --accent-silver: #c0c0c0;
+  --accent-green: #00d4aa;
+  --accent-red: #ff4444;
+  
+  /* Couleurs de texte */
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  
+  /* Espacements */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+

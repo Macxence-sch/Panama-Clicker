@@ -1,0 +1,289 @@
+/**
+ * App.css
+ * Styles globaux de l'application
+ */
+
+.app {
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  background: var(--bg-secondary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border-bottom: 2px solid var(--accent-gold);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  position: relative;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  color: var(--accent-gold);
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+  letter-spacing: 2px;
+}
+
+.score-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--spacing-xs);
+}
+
+.money-display {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--accent-green);
+  text-shadow: 0 0 10px rgba(0, 212, 170, 0.5);
+}
+
+.rps-display {
+  font-size: 1.2rem;
+  color: var(--accent-silver);
+}
+
+.reset-button {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
+  border: 2px solid var(--accent-gold);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+  z-index: 10;
+}
+
+.reset-button:hover {
+  background: linear-gradient(135deg, #a0522d 0%, #8b4513 100%);
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.5);
+  border-color: #e4c047;
+}
+
+.reset-button:active {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Conteneur principal */
+.game-container {
+  display: flex;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.click-zone {
+  flex: 0 0 60%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.upgrades-panel {
+  flex: 0 0 40%;
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  padding: var(--spacing-md);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--bg-tertiary);
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  overflow-x: visible;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.upgrades-panel::-webkit-scrollbar {
+  width: 10px;
+}
+
+.upgrades-panel::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-radius: 10px;
+}
+
+.upgrades-panel::-webkit-scrollbar-thumb {
+  background: var(--accent-gold);
+  border-radius: 10px;
+}
+
+.upgrades-panel::-webkit-scrollbar-thumb:hover {
+  background: #e4c047;
+}
+
+/* Notifications */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  z-index: 100000;
+  max-width: 400px;
+  opacity: 0;
+  transform: translateX(400px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.notification.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.notification-success {
+  background: linear-gradient(135deg, var(--accent-green) 0%, #00b894 100%);
+  color: var(--text-primary);
+  border: 2px solid #00b894;
+}
+
+.notification-error {
+  background: linear-gradient(135deg, var(--accent-red) 0%, #cc0000 100%);
+  color: var(--text-primary);
+  border: 2px solid #cc0000;
+}
+
+.notification-warning {
+  background: linear-gradient(135deg, #ffaa00 0%, #ff8800 100%);
+  color: var(--text-primary);
+  border: 2px solid #ff8800;
+}
+
+.notification-info {
+  background: linear-gradient(135deg, var(--accent-silver) 0%, #888888 100%);
+  color: var(--text-primary);
+  border: 2px solid var(--accent-silver);
+}
+
+/* Alerte de contrôle fiscal */
+.fiscal-audit-alert {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--accent-red);
+  color: var(--text-primary);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 20px;
+  box-shadow: 0 0 50px rgba(255, 68, 68, 0.8);
+  z-index: 1000;
+  animation: fiscal-alert-pulse 1s infinite;
+  border: 4px solid #cc0000;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+@keyframes fiscal-alert-pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 50px rgba(255, 68, 68, 0.8);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow: 0 0 80px rgba(255, 68, 68, 1);
+  }
+}
+
+/* Bouton pour ouvrir le leaderboard */
+.open-leaderboard-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, var(--accent-gold) 0%, #b8941f 100%);
+  border: 3px solid var(--accent-gold);
+  border-radius: 50%;
+  color: var(--text-primary);
+  font-size: 2rem;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.5);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+
+.open-leaderboard-button:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 30px rgba(212, 175, 55, 0.8);
+  background: linear-gradient(135deg, #e4c047 0%, var(--accent-gold) 100%);
+}
+
+.open-leaderboard-button:active {
+  transform: scale(1.05) rotate(5deg);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .game-container {
+    flex-direction: column;
+  }
+  
+  .click-zone {
+    flex: 1;
+  }
+  
+  .upgrades-panel {
+    flex: 1;
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .header h1 {
+    font-size: 2rem;
+  }
+  
+  .money-display {
+    font-size: 1.5rem;
+  }
+  
+  .game-container {
+    padding: var(--spacing-sm);
+  }
+  
+  .notification {
+    right: 10px;
+    left: 10px;
+    max-width: none;
+    transform: translateY(-100px);
+  }
+  
+  .notification.show {
+    transform: translateY(0);
+  }
+  
+  .open-leaderboard-button {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    bottom: 20px;
+    right: 20px;
+  }
+}
+

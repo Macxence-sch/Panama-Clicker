@@ -1,0 +1,150 @@
+/**
+ * MultiplierUpgrades.css
+ */
+
+.multiplier-upgrades-section {
+  margin-bottom: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 2px solid var(--bg-tertiary);
+  overflow: visible;
+  position: relative;
+  z-index: 10;
+}
+
+.multiplier-upgrades-section h3 {
+  color: var(--accent-gold);
+  margin-bottom: var(--spacing-sm);
+  font-size: 1.2rem;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.multiplier-upgrades-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
+  position: relative;
+}
+
+.multiplier-upgrade-item {
+  position: relative;
+  overflow: visible;
+  z-index: 100;
+}
+
+.multiplier-icon-button {
+  width: 60px;
+  height: 60px;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--bg-primary);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+
+.multiplier-icon-button:hover:not(.disabled):not(.owned) {
+  border-color: var(--accent-gold);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+  transform: translateY(-2px) scale(1.05);
+  background: var(--bg-secondary);
+}
+
+.multiplier-icon-button.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.multiplier-icon-button.owned {
+  background: linear-gradient(135deg, var(--accent-green) 0%, #00b894 100%);
+  border-color: var(--accent-green);
+  cursor: default;
+  opacity: 0.8;
+}
+
+.multiplier-icon-button.purchased {
+  animation: purchase-flash 0.3s ease;
+}
+
+.multiplier-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.multiplier-emoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.multiplier-tooltip {
+  position: fixed;
+  background: var(--bg-secondary);
+  border: 2px solid var(--accent-gold);
+  border-radius: 10px;
+  padding: var(--spacing-sm);
+  min-width: 200px;
+  max-width: 250px;
+  z-index: 99999;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  white-space: normal;
+  word-wrap: break-word;
+  transform: translateX(-50%) translateY(-100%);
+  pointer-events: auto;
+}
+
+.tooltip-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.tooltip-emoji {
+  font-size: 1.5rem;
+}
+
+.tooltip-name {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.tooltip-description {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: var(--spacing-xs) 0;
+  font-style: italic;
+}
+
+.tooltip-cost {
+  font-size: 0.9rem;
+  color: var(--accent-gold);
+  font-weight: bold;
+  margin-top: var(--spacing-xs);
+  padding-top: var(--spacing-xs);
+  border-top: 1px solid var(--bg-tertiary);
+}
+
+@keyframes purchase-flash {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
