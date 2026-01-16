@@ -76,12 +76,16 @@ export const leaderboardService = {
   getLeaderboard: async (limit = 10) => {
     if (!SUPABASE_CONFIG.supabaseAnonKey) {
       console.error('❌ Clé API Supabase manquante')
-      return { success: false, message: 'API non configurée - Vérifiez votre fichier .env', data: [] }
+      console.error('   Vérifiez que votre fichier .env contient VITE_SUPABASE_ANON_KEY')
+      console.error('   Redémarrez le serveur de développement (npm run dev) après avoir modifié .env')
+      return { success: false, message: 'API non configurée - Redémarrez le serveur (npm run dev) après avoir configuré .env', data: [] }
     }
 
     if (!SUPABASE_CONFIG.supabaseUrl) {
       console.error('❌ URL Supabase manquante')
-      return { success: false, message: 'URL Supabase manquante - Vérifiez votre fichier .env', data: [] }
+      console.error('   Vérifiez que votre fichier .env contient VITE_SUPABASE_URL')
+      console.error('   Redémarrez le serveur de développement (npm run dev) après avoir modifié .env')
+      return { success: false, message: 'URL Supabase manquante - Redémarrez le serveur (npm run dev)', data: [] }
     }
 
     try {
