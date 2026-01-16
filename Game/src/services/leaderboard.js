@@ -27,7 +27,8 @@ export const leaderboardService = {
   },
 
   /**
-   * Envoie un score à Supabase
+   * Envoie ou met à jour un score à Supabase
+   * Si un score existe déjà pour ce nom, il sera mis à jour
    */
   submitScore: async (name, money, renaissanceCount) => {
     if (!name) {
@@ -40,32 +41,82 @@ export const leaderboardService = {
 
     try {
       // Arrondir money à un entier car la colonne est BIGINT (entier)
-      // Utiliser Math.round() pour arrondir au plus proche entier
       const moneyInt = Math.round(Number(money)) || 0
       const renaissanceInt = Math.round(Number(renaissanceCount)) || 0
+      const trimmedName = name.trim()
       
       const scoreData = {
-        name: name.trim(),
         money: moneyInt,
         renaissance_count: renaissanceInt
       }
       
-      // Vérification de débogage
-      if (import.meta.env.DEV) {
-        console.log('📤 Envoi du score:', scoreData)
-      }
-
-      const url = `${SUPABASE_CONFIG.supabaseUrl}/rest/v1/${SUPABASE_CONFIG.tableName}`
-      const response = await fetch(url, {
-        method: 'POST',
+      // Vérifier si un score existe déjà pour ce nom
+      const checkUrl = `${SUPABASE_CONFIG.supabaseUrl}/rest/v1/${SUPABASE_CONFIG.tableName}?name=eq.${encodeURIComponent(trimmedName)}&select=id`
+      const checkResponse = await fetch(checkUrl, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'apikey': SUPABASE_CONFIG.supabaseAnonKey,
-          'Authorization': `Bearer ${SUPABASE_CONFIG.supabaseAnonKey}`,
-          'Prefer': 'return=representation'
-        },
-        body: JSON.stringify(scoreData)
+          'Authorization': `Bearer ${SUPABASE_CONFIG.supabaseAnonKey}`
+        }
       })
+
+      let response
+      let isUpdate = false
+
+      if (checkResponse.ok) {
+        const existingScores = await checkResponse.json()
+        
+        if (existingScores && existingScores.length > 0) {
+          // Score existe déjà, faire un UPDATE
+          isUpdate = true
+          const scoreId = existingScores[0].id
+          const updateUrl = `${SUPABASE_CONFIG.supabaseUrl}/rest/v1/${SUPABASE_CONFIG.tableName}?id=eq.${scoreId}`
+          
+          response = await fetch(updateUrl, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_CONFIG.supabaseAnonKey,
+              'Authorization': `Bearer ${SUPABASE_CONFIG.supabaseAnonKey}`,
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(scoreData)
+          })
+        } else {
+          // Score n'existe pas, faire un INSERT
+          const insertUrl = `${SUPABASE_CONFIG.supabaseUrl}/rest/v1/${SUPABASE_CONFIG.tableName}`
+          response = await fetch(insertUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_CONFIG.supabaseAnonKey,
+              'Authorization': `Bearer ${SUPABASE_CONFIG.supabaseAnonKey}`,
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+              ...scoreData,
+              name: trimmedName
+            })
+          })
+        }
+      } else {
+        // Erreur lors de la vérification, essayer quand même un INSERT
+        const insertUrl = `${SUPABASE_CONFIG.supabaseUrl}/rest/v1/${SUPABASE_CONFIG.tableName}`
+        response = await fetch(insertUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_CONFIG.supabaseAnonKey,
+            'Authorization': `Bearer ${SUPABASE_CONFIG.supabaseAnonKey}`,
+            'Prefer': 'return=representation'
+          },
+          body: JSON.stringify({
+            ...scoreData,
+            name: trimmedName
+          })
+        })
+      }
 
       if (!response.ok) {
         const errorText = await response.text()
@@ -73,7 +124,15 @@ export const leaderboardService = {
       }
 
       const result = await response.json()
-      return { success: true, message: 'Score envoyé avec succès !', data: result }
+      const message = isUpdate 
+        ? 'Score mis à jour avec succès !' 
+        : 'Score envoyé avec succès !'
+      
+      if (import.meta.env.DEV) {
+        console.log(isUpdate ? '🔄 Score mis à jour' : '📤 Nouveau score créé', result)
+      }
+      
+      return { success: true, message, data: result }
     } catch (error) {
       console.error('Erreur lors de l\'envoi du score:', error)
       return { success: false, message: `Erreur: ${error.message}` }

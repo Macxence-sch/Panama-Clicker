@@ -90,6 +90,7 @@ ALTER TABLE scores ENABLE ROW LEVEL SECURITY;
 -- Supprimer les anciennes politiques si elles existent
 DROP POLICY IF EXISTS policy_scores_select_public ON scores;
 DROP POLICY IF EXISTS policy_scores_insert_public ON scores;
+DROP POLICY IF EXISTS policy_scores_update_public ON scores;
 
 -- Politique: Lecture publique (pour afficher le leaderboard)
 CREATE POLICY policy_scores_select_public
@@ -114,6 +115,19 @@ CREATE POLICY policy_scores_insert_public
     );
 
 COMMENT ON POLICY policy_scores_insert_public ON scores IS 'Permet à tous d''insérer des scores avec validation';
+
+-- Politique: Mise à jour publique (pour mettre à jour son score)
+CREATE POLICY policy_scores_update_public
+    ON scores
+    FOR UPDATE
+    TO public
+    USING (true)  -- Permet de mettre à jour n'importe quel score
+    WITH CHECK (
+        money >= 0
+        AND renaissance_count >= 0
+    );
+
+COMMENT ON POLICY policy_scores_update_public ON scores IS 'Permet à tous de mettre à jour les scores avec validation';
 
 -- ============================================================================
 -- SECTION 5: VÉRIFICATIONS ET TESTS
