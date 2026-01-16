@@ -13,6 +13,12 @@ export const Leaderboard = ({ isOpen, onClose, playerName, money, renaissanceCou
     const result = await leaderboardService.getLeaderboard(10)
     if (result.success) {
       setLeaderboard(result.data || [])
+    } else {
+      console.error('Erreur leaderboard:', result.message)
+      // Afficher un message d'erreur à l'utilisateur
+      if (result.message && onSubmitScore) {
+        onSubmitScore(result.message, 'error')
+      }
     }
     setLoading(false)
   }

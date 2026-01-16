@@ -4,9 +4,18 @@
  */
 
 const SUPABASE_CONFIG = {
-  supabaseUrl: 'https://ztroellyaoerahiowvpd.supabase.co',
-  supabaseAnonKey: '', // À AJOUTER
-  tableName: 'scores'
+  supabaseUrl: import.meta.env.VITE_SUPABASE_URL || '',
+  supabaseAnonKey: import.meta.env.VITE_SUPABASE_ANON_KEY || '',
+  tableName: import.meta.env.VITE_SUPABASE_TABLE_NAME || 'scores'
+}
+
+// Debug: Vérifier que les variables sont chargées (uniquement en développement)
+if (import.meta.env.DEV) {
+  console.log('🔍 Configuration Supabase:', {
+    url: SUPABASE_CONFIG.supabaseUrl ? '✅ Définie' : '❌ Manquante',
+    key: SUPABASE_CONFIG.supabaseAnonKey ? '✅ Définie' : '❌ Manquante',
+    table: SUPABASE_CONFIG.tableName
+  })
 }
 
 export const leaderboardService = {
@@ -66,11 +75,22 @@ export const leaderboardService = {
    */
   getLeaderboard: async (limit = 10) => {
     if (!SUPABASE_CONFIG.supabaseAnonKey) {
-      return { success: false, message: 'API non configurée', data: [] }
+      console.error('❌ Clé API Supabase manquante')
+      return { success: false, message: 'API non configurée - Vérifiez votre fichier .env', data: [] }
+    }
+
+    if (!SUPABASE_CONFIG.supabaseUrl) {
+      console.error('❌ URL Supabase manquante')
+      return { success: false, message: 'URL Supabase manquante - Vérifiez votre fichier .env', data: [] }
     }
 
     try {
       const url = `${SUPABASE_CONFIG.supabaseUrl}/rest/v1/${SUPABASE_CONFIG.tableName}?select=*&order=money.desc&limit=${limit}`
+      
+      if (import.meta.env.DEV) {
+        console.log('📡 Requête leaderboard:', url)
+      }
+
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -82,10 +102,15 @@ export const leaderboardService = {
 
       if (!response.ok) {
         const errorText = await response.text()
+        console.error('❌ Erreur HTTP:', response.status, errorText)
         throw new Error(`Erreur HTTP: ${response.status} - ${errorText}`)
       }
 
       const data = await response.json()
+
+      if (import.meta.env.DEV) {
+        console.log('✅ Leaderboard chargé:', data.length, 'scores')
+      }
 
       // Convertir snake_case en camelCase
       const leaderboard = data.map(score => ({
@@ -96,7 +121,7 @@ export const leaderboardService = {
 
       return { success: true, data: leaderboard }
     } catch (error) {
-      console.error('Erreur lors de la récupération du leaderboard:', error)
+      console.error('❌ Erreur lors de la récupération du leaderboard:', error)
       return { success: false, message: `Erreur: ${error.message}`, data: [] }
     }
   }

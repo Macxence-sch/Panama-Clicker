@@ -1,12 +1,38 @@
 # 🚀 Déployer votre projet en 5 minutes
 
-## Option 1 : Vercel (Le plus simple) ⭐
+## Étape 1 : Configurer Supabase (Local)
 
-### Étape 1 : Créer un compte GitHub
+Avant de déployer, configurez vos variables d'environnement :
+
+1. Allez sur [supabase.com](https://supabase.com) → Votre projet
+2. Settings → API
+3. Copiez :
+   - **Project URL** (ex: `https://xxxxx.supabase.co`)
+   - **anon/public key** (la clé publique, pas la service_role)
+
+4. Dans le projet, créez un fichier `.env` à la racine :
+   ```env
+   VITE_SUPABASE_URL=https://votre-projet.supabase.co
+   VITE_SUPABASE_ANON_KEY=votre_cle_anon_ici
+   VITE_SUPABASE_TABLE_NAME=scores
+   ```
+
+5. Testez localement :
+   ```powershell
+   npm run dev
+   ```
+
+---
+
+## Étape 2 : Créer un compte GitHub
+
 1. Allez sur [github.com](https://github.com) et créez un compte
 2. Créez un nouveau repository (bouton "+" en haut à droite)
 
-### Étape 2 : Pousser votre code
+---
+
+## Étape 3 : Pousser votre code
+
 Ouvrez PowerShell dans le dossier du projet et exécutez :
 
 ```powershell
@@ -19,49 +45,30 @@ git push -u origin main
 ```
 *(Remplacez VOTRE_USERNAME par votre nom d'utilisateur GitHub)*
 
-### Étape 3 : Déployer sur Vercel
+---
+
+## Étape 4 : Déployer sur Vercel
+
 1. Allez sur [vercel.com](https://vercel.com)
 2. Cliquez sur "Sign Up" et connectez-vous avec GitHub
 3. Cliquez sur "Add New Project"
 4. Sélectionnez votre repository `panama-clicker`
 5. Vercel détecte automatiquement Vite - cliquez sur "Deploy"
-6. ✅ **Votre site est en ligne !** (URL : `https://panama-clicker.vercel.app`)
+6. **⚠️ IMPORTANT** : Avant de finaliser, ajoutez vos variables d'environnement :
+   - Cliquez sur "Environment Variables"
+   - Ajoutez :
+     - `VITE_SUPABASE_URL` = votre URL Supabase
+     - `VITE_SUPABASE_ANON_KEY` = votre clé anon
+     - `VITE_SUPABASE_TABLE_NAME` = `scores`
+   - Cliquez sur "Redeploy" pour appliquer les changements
+7. ✅ **Votre site est en ligne !** (URL : `https://panama-clicker.vercel.app`)
 
 ---
 
-## Option 2 : Netlify (Alternative)
+## ⚠️ Note importante sur Supabase
 
-### Méthode rapide (sans Git) :
-1. Exécutez dans PowerShell :
-   ```powershell
-   npm run build
-   ```
-2. Allez sur [app.netlify.com/drop](https://app.netlify.com/drop)
-3. Glissez-déposez le dossier `dist` qui vient d'être créé
-4. ✅ Votre site est en ligne !
-
-### Méthode avec Git (recommandée) :
-1. Poussez votre code sur GitHub (voir Option 1, étapes 1-2)
-2. Allez sur [netlify.com](https://netlify.com)
-3. Connectez-vous avec GitHub
-4. Cliquez sur "New site from Git"
-5. Sélectionnez votre repository
-6. Build command : `npm run build`
-7. Publish directory : `dist`
-8. Cliquez sur "Deploy"
-
----
-
-## ⚠️ Important : Configurer Supabase
-
-Après le déploiement, vous devez autoriser votre site dans Supabase :
-
-1. Allez sur [supabase.com](https://supabase.com) → Votre projet
-2. Settings → API
-3. Dans la section "CORS", ajoutez votre URL :
-   - Si Vercel : `https://panama-clicker.vercel.app`
-   - Si Netlify : `https://panama-clicker.netlify.app`
-4. Cliquez sur "Save"
+Supabase gère automatiquement les headers CORS pour les API REST.
+**Aucune configuration CORS supplémentaire n'est nécessaire** dans le dashboard Supabase.
 
 ---
 

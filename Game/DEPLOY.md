@@ -1,8 +1,6 @@
 # 🚀 Guide de Déploiement - Panama Clicker
 
-## Options gratuites pour déployer votre projet
-
-### 1. **Vercel** (Recommandé - Le plus simple) ⭐
+## Déploiement sur Vercel ⭐
 
 **Avantages :**
 - ✅ Gratuit et illimité
@@ -34,6 +32,12 @@
    - Cliquez sur "New Project"
    - Importez votre repository
    - Vercel détecte automatiquement Vite
+   - **⚠️ IMPORTANT** : Avant de finaliser, ajoutez vos variables d'environnement :
+     - Cliquez sur "Environment Variables"
+     - Ajoutez :
+       - `VITE_SUPABASE_URL` = votre URL Supabase
+       - `VITE_SUPABASE_ANON_KEY` = votre clé anon
+       - `VITE_SUPABASE_TABLE_NAME` = `scores`
    - Cliquez sur "Deploy"
    - ✅ Votre site est en ligne en 2 minutes !
 
@@ -41,91 +45,40 @@
 
 ---
 
-### 2. **Netlify** (Alternative excellente)
+## ⚙️ Configuration Supabase
 
-**Avantages :**
-- ✅ Gratuit
-- ✅ Déploiement drag & drop (sans Git)
-- ✅ Déploiement automatique depuis GitHub
-- ✅ HTTPS automatique
+### Configuration locale
 
-**Étapes :**
-
-1. **Avec GitHub (recommandé)**
-   - Allez sur [netlify.com](https://netlify.com)
-   - Connectez-vous avec GitHub
-   - Cliquez sur "New site from Git"
-   - Sélectionnez votre repository
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-   - Cliquez sur "Deploy"
-
-2. **Sans GitHub (drag & drop)**
-   ```bash
-   npm run build
-   ```
-   - Allez sur [app.netlify.com/drop](https://app.netlify.com/drop)
-   - Glissez-déposez le dossier `dist`
-   - ✅ Votre site est en ligne !
-
-**URL générée :** `https://votre-projet.netlify.app`
-
----
-
-### 3. **Cloudflare Pages** (Très rapide)
-
-**Avantages :**
-- ✅ Gratuit
-- ✅ CDN ultra-rapide
-- ✅ Déploiement depuis GitHub
-
-**Étapes :**
-1. Allez sur [pages.cloudflare.com](https://pages.cloudflare.com)
-2. Connectez-vous avec GitHub
-3. Sélectionnez votre repository
-4. Build command: `npm run build`
-5. Build output directory: `dist`
-6. Cliquez sur "Save and Deploy"
-
-**URL générée :** `https://votre-projet.pages.dev`
-
----
-
-### 4. **GitHub Pages** (Gratuit mais nécessite configuration)
-
-**Avantages :**
-- ✅ Gratuit
-- ✅ Intégré à GitHub
-
-**Configuration nécessaire :**
-- Voir le fichier `github-pages-setup.md` pour les instructions détaillées
-
----
-
-## ⚙️ Configuration Supabase pour la production
-
-**Important :** Après le déploiement, vous devez configurer CORS dans Supabase :
-
-1. Allez dans votre projet Supabase
+1. Allez sur [supabase.com](https://supabase.com) → Votre projet
 2. Settings → API
-3. Dans "CORS", ajoutez votre URL de déploiement :
-   - `https://votre-projet.vercel.app`
-   - `https://votre-projet.netlify.app`
-   - etc.
+3. Copiez :
+   - **Project URL** (ex: `https://xxxxx.supabase.co`)
+   - **anon/public key** (la clé publique, pas la service_role)
+
+4. Créez un fichier `.env` à la racine du projet :
+   ```env
+   VITE_SUPABASE_URL=https://votre-projet.supabase.co
+   VITE_SUPABASE_ANON_KEY=votre_cle_anon_ici
+   VITE_SUPABASE_TABLE_NAME=scores
+   ```
+
+### Configuration en production (Vercel)
+
+Les variables d'environnement doivent être configurées dans le dashboard Vercel (voir étape 3 ci-dessus).
+
+### Note importante
+
+Supabase gère automatiquement les headers CORS pour les API REST.
+**Aucune configuration CORS supplémentaire n'est nécessaire** dans le dashboard Supabase.
 
 ---
 
 ## 📝 Checklist avant déploiement
 
-- [ ] Ajouter votre clé API Supabase dans `src/services/leaderboard.js`
+- [ ] Créer le fichier `.env` avec vos clés Supabase
 - [ ] Tester localement avec `npm run dev`
 - [ ] Vérifier que le build fonctionne : `npm run build`
 - [ ] Pousser le code sur GitHub
-- [ ] Configurer CORS dans Supabase avec votre URL de production
-
----
-
-## 🎯 Recommandation
-
-**Utilisez Vercel** - C'est le plus simple et le plus rapide pour un projet React/Vite !
+- [ ] Configurer les variables d'environnement dans Vercel
+- [ ] Tester l'application déployée
 
