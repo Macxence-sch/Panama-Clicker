@@ -46,7 +46,7 @@ export const Leaderboard = ({ isOpen, onClose, playerName, money, renaissanceCou
   return (
     <>
       <div className="leaderboard-overlay" onClick={onClose} />
-      <div className="leaderboard-panel">
+      <div className={`leaderboard-panel ${isOpen ? 'open' : ''}`}>
         <div className="leaderboard-header">
           <h2>🏆 Leaderboard</h2>
           <button className="close-button" onClick={onClose}>×</button>
