@@ -39,9 +39,10 @@ export const leaderboardService = {
     }
 
     try {
+      // Arrondir money à un entier car la colonne est BIGINT (entier)
       const scoreData = {
         name: name.trim(),
-        money: money,
+        money: Math.floor(money), // Convertir en entier (arrondi vers le bas)
         renaissance_count: renaissanceCount
       }
 
