@@ -2,7 +2,7 @@ import React from 'react'
 import { formatNumber } from '../utils/formatters'
 
 export const Header = ({ money, revenuePerSecond, renaissanceCount, renaissanceBoost, onRenaissance }) => {
-  const currentBoost = Math.pow(renaissanceBoost, renaissanceCount)
+  const nextBoost = Math.pow(renaissanceBoost, renaissanceCount + 1)
 
   return (
     <header className="header">
@@ -11,7 +11,7 @@ export const Header = ({ money, revenuePerSecond, renaissanceCount, renaissanceB
         className="reset-button"
         onClick={onRenaissance}
       >
-        🔄 Renaissance (x{currentBoost.toFixed(2)})
+        🔄 Renaissance (x{nextBoost.toFixed(2)})
       </button>
       <div className="score-display">
         <div className="money-display">

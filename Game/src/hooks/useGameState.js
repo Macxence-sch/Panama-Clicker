@@ -36,7 +36,7 @@ export const useGameState = () => {
 
   // Renaissance
   const [renaissanceCount, setRenaissanceCount] = useState(0)
-  const renaissanceBoost = 1.20
+  const renaissanceBoost = 1.05
 
   // Refs pour les valeurs qui ne doivent pas déclencher de re-render
   const multipliersRef = useRef({ rps: 1, click: 1, fear: 1 })

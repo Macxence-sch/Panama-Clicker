@@ -24,8 +24,9 @@ function App() {
 
   const handleRenaissance = () => {
     const currentBoost = Math.pow(gameState.renaissanceBoost, gameState.renaissanceCount)
+    const nextBoost = Math.pow(gameState.renaissanceBoost, gameState.renaissanceCount + 1)
     if (window.confirm(
-      `Voulez-vous effectuer une Renaissance ? Vous perdrez votre progression mais gagnerez un boost permanent de x${gameState.renaissanceBoost} (x${currentBoost.toFixed(2)} total).`
+      `Voulez-vous effectuer une Renaissance ? Vous perdrez votre progression mais gagnerez un boost permanent de x${gameState.renaissanceBoost} (x${nextBoost.toFixed(2)} total).`
     )) {
       gameState.performRenaissance()
       showNotification('Renaissance effectuée !', 'success')
