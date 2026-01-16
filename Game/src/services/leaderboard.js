@@ -40,10 +40,19 @@ export const leaderboardService = {
 
     try {
       // Arrondir money à un entier car la colonne est BIGINT (entier)
+      // Utiliser Math.round() pour arrondir au plus proche entier
+      const moneyInt = Math.round(Number(money)) || 0
+      const renaissanceInt = Math.round(Number(renaissanceCount)) || 0
+      
       const scoreData = {
         name: name.trim(),
-        money: Math.floor(money), // Convertir en entier (arrondi vers le bas)
-        renaissance_count: renaissanceCount
+        money: moneyInt,
+        renaissance_count: renaissanceInt
+      }
+      
+      // Vérification de débogage
+      if (import.meta.env.DEV) {
+        console.log('📤 Envoi du score:', scoreData)
       }
 
       const url = `${SUPABASE_CONFIG.supabaseUrl}/rest/v1/${SUPABASE_CONFIG.tableName}`
