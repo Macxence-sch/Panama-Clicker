@@ -248,38 +248,44 @@ export const useGameState = () => {
    * Sauvegarde l'état
    */
   const save = useCallback(() => {
-    // S'assurer que tous les upgrades sont présents dans ownedUpgrades avant de sauvegarder
-    const completeUpgrades = { ...ownedUpgrades }
-    GAME_DATA.UPGRADES.forEach(upgrade => {
-      if (completeUpgrades[upgrade.id] === undefined) {
-        completeUpgrades[upgrade.id] = 0
+    console.log('🔄 Fonction save() appelée')
+    try {
+      // S'assurer que tous les upgrades sont présents dans ownedUpgrades avant de sauvegarder
+      const completeUpgrades = { ...ownedUpgrades }
+      GAME_DATA.UPGRADES.forEach(upgrade => {
+        if (completeUpgrades[upgrade.id] === undefined) {
+          completeUpgrades[upgrade.id] = 0
+        }
+      })
+      
+      // Nettoyer les valeurs pour la sérialisation JSON
+      const cleanSaveData = {
+        money: isNaN(money) || !isFinite(money) ? 0 : Number(money),
+        ownedUpgrades: completeUpgrades,
+        suspicion: isNaN(suspicion) || !isFinite(suspicion) ? 0 : Math.max(0, Math.min(100, Number(suspicion))),
+        isFiscalAudit: Boolean(isFiscalAudit),
+        fiscalAuditEndTime: isNaN(fiscalAuditEndTime) || !isFinite(fiscalAuditEndTime) ? 0 : Number(fiscalAuditEndTime),
+        renaissanceCount: isNaN(renaissanceCount) || !isFinite(renaissanceCount) ? 0 : Math.max(0, Number(renaissanceCount))
       }
-    })
-    
-    const saveData = {
-      money,
-      ownedUpgrades: completeUpgrades,
-      suspicion,
-      isFiscalAudit,
-      fiscalAuditEndTime,
-      renaissanceCount
+      
+      console.log('💾 Tentative de sauvegarde:', {
+        money: cleanSaveData.money,
+        upgradesCount: Object.keys(cleanSaveData.ownedUpgrades).length,
+        machine_size: cleanSaveData.ownedUpgrades.machine_size
+      })
+      
+      // Sauvegarder directement sans test préalable (storage.save gère déjà les erreurs)
+      const saveResult = storage.save(cleanSaveData)
+      
+      if (saveResult) {
+        console.log('✅ Sauvegarde réussie')
+      } else {
+        console.error('❌ Échec de la sauvegarde')
+      }
+    } catch (error) {
+      console.error('❌ ERREUR dans la fonction save:', error)
+      console.error('Stack:', error.stack)
     }
-    
-    // Debug: vérifier que machine_size est présent
-    console.log('=== SAUVEGARDE ===')
-    console.log('machine_size présent:', completeUpgrades.hasOwnProperty('machine_size'))
-    console.log('machine_size valeur:', completeUpgrades.machine_size)
-    console.log('Tous les IDs d\'upgrades:', Object.keys(completeUpgrades))
-    console.log('IDs attendus:', GAME_DATA.UPGRADES.map(u => u.id))
-    console.log('machine_size dans GAME_DATA:', GAME_DATA.UPGRADES.find(u => u.id === 'machine_size'))
-    console.log('Données complètes à sauvegarder:', saveData)
-    
-    storage.save(saveData)
-    
-    // Vérifier ce qui a été réellement sauvegardé
-    const saved = storage.load()
-    console.log('Vérification après sauvegarde - machine_size:', saved?.ownedUpgrades?.machine_size)
-    console.log('Vérification après sauvegarde - tous les IDs:', Object.keys(saved?.ownedUpgrades || {}))
   }, [money, ownedUpgrades, suspicion, isFiscalAudit, fiscalAuditEndTime, renaissanceCount])
 
   /**
@@ -342,6 +348,22 @@ export const useGameState = () => {
 
   // Charger au montage
   useEffect(() => {
+    // Test du localStorage au démarrage
+    console.log('🧪 TEST LOCALSTORAGE AU DÉMARRAGE')
+    try {
+      const testKey = 'panamaClickerTest'
+      localStorage.setItem(testKey, 'test')
+      const testValue = localStorage.getItem(testKey)
+      if (testValue === 'test') {
+        console.log('✅ localStorage fonctionne')
+        localStorage.removeItem(testKey)
+      } else {
+        console.error('❌ localStorage ne fonctionne pas correctement')
+      }
+    } catch (error) {
+      console.error('❌ Erreur localStorage:', error)
+    }
+    
     load()
   }, [load])
 
@@ -398,11 +420,23 @@ export const useGameState = () => {
 
   // Sauvegarde automatique
   useEffect(() => {
+    console.log('⏰ Configuration de la sauvegarde automatique (toutes les 10 secondes)')
+    
+    // Test immédiat
+    setTimeout(() => {
+      console.log('🧪 Test de sauvegarde immédiat')
+      save()
+    }, 2000)
+    
     const interval = setInterval(() => {
+      console.log('⏰ Sauvegarde automatique déclenchée')
       save()
     }, 10000)
 
-    return () => clearInterval(interval)
+    return () => {
+      console.log('🛑 Arrêt de la sauvegarde automatique')
+      clearInterval(interval)
+    }
   }, [save])
 
   return {

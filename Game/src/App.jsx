@@ -16,6 +16,72 @@ function App() {
   const [playerName, setPlayerName] = useState(storage.getPlayerName())
   const [notification, setNotification] = useState(null)
 
+  // Exposer une fonction de test globale pour le débogage
+  useEffect(() => {
+    window.testPanamaStorage = () => {
+      console.log('🧪 TEST MANUEL DU LOCALSTORAGE')
+      console.log('==============================')
+      
+      // Test 1: localStorage disponible
+      console.log('1. Test localStorage disponible:', typeof localStorage !== 'undefined')
+      
+      // Test 2: Écrire et lire
+      try {
+        localStorage.setItem('test', 'test123')
+        const read = localStorage.getItem('test')
+        console.log('2. Test écriture/lecture:', read === 'test123' ? '✅ OK' : '❌ ÉCHEC')
+        localStorage.removeItem('test')
+      } catch (e) {
+        console.error('2. Erreur:', e)
+      }
+      
+      // Test 3: Sauvegarder des données de test
+      try {
+        const testData = {
+          money: 1000,
+          ownedUpgrades: { machine_size: 5, cousin: 2 },
+          suspicion: 10,
+          isFiscalAudit: false,
+          fiscalAuditEndTime: 0,
+          renaissanceCount: 0
+        }
+        const result = storage.save(testData)
+        console.log('3. Test sauvegarde:', result ? '✅ OK' : '❌ ÉCHEC')
+        
+        const loaded = storage.load()
+        console.log('4. Test chargement:', loaded ? '✅ OK' : '❌ ÉCHEC')
+        if (loaded) {
+          console.log('   Données chargées:', loaded)
+        }
+      } catch (e) {
+        console.error('3-4. Erreur:', e)
+      }
+      
+      // Test 5: Vérifier la clé actuelle
+      const current = localStorage.getItem('panamaClickerSave')
+      console.log('5. Données actuelles dans localStorage:', current ? `✅ Présentes (${current.length} caractères)` : '❌ Absentes')
+      if (current) {
+        try {
+          const parsed = JSON.parse(current)
+          console.log('   Contenu parsé:', parsed)
+        } catch (e) {
+          console.error('   Erreur parsing:', e)
+        }
+      }
+      
+      // Test 6: Forcer une sauvegarde
+      console.log('6. Test sauvegarde forcée...')
+      gameState.save()
+      
+      console.log('==============================')
+      console.log('💡 Utilisez window.testPanamaStorage() pour relancer ce test')
+    }
+    
+    return () => {
+      delete window.testPanamaStorage
+    }
+  }, [gameState])
+
   const showNotification = (message, type = 'info') => {
     setNotification({ message, type })
     setTimeout(() => setNotification(null), 3000)
@@ -35,6 +101,13 @@ function App() {
 
   const handleSubmitScore = (message, type) => {
     showNotification(message, type)
+  }
+
+  const handleResetStorage = () => {
+    if (window.confirm('Voulez-vous vraiment réinitialiser toutes les données sauvegardées ? Cette action est irréversible.')) {
+      storage.clear()
+      window.location.reload()
+    }
   }
 
   const effectiveRPS = gameState.getEffectiveRevenuePerSecond()
@@ -96,6 +169,27 @@ function App() {
         onClick={() => setShowLeaderboard(true)}
       >
         🏆
+      </button>
+
+      <button
+        className="reset-storage-button"
+        onClick={handleResetStorage}
+        title="Réinitialiser le localStorage"
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          padding: '10px 15px',
+          backgroundColor: '#8b0000',
+          color: 'white',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer',
+          fontSize: '0.9rem',
+          zIndex: 1000
+        }}
+      >
+        🗑️ Reset Storage
       </button>
 
       <Leaderboard
