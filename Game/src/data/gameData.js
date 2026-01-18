@@ -9,60 +9,165 @@ export const GAME_DATA = {
   
   UPGRADES: [
     {
+      id: 'machine_size',
+      name: 'Taille Machine',
+      baseCost: 15,
+      clickValueIncrease: 1,
+      description: 'Augmente la valeur du clic de 1€',
+      emoji: '🔧',
+      type: 'click_upgrade'
+    },
+    {
       id: 'cousin',
       name: 'Cousin Auto-entrepreneur',
-      baseCost: 10,
-      revenuePerSecond: 0.5,
+      baseCost: 100,
+      revenuePerSecond: 1,
       description: 'Votre cousin déclare des revenus fictifs pour vous',
       emoji: '👨‍💼'
     },
     {
-      id: 'kebab',
-      name: 'Snack Kebab Fantôme',
-      baseCost: 60,
-      revenuePerSecond: 5,
-      description: 'Un restaurant qui n\'existe que sur papier',
-      emoji: '🥙'
-    },
-    {
       id: 'barber',
       name: 'Barber',
-      baseCost: 300,
-      revenuePerSecond: 25,
+      baseCost: 500,
+      revenuePerSecond: 5,
       description: 'Un salon de coiffure qui blanchit plus que les cheveux',
       emoji: '💇'
     },
     {
+      id: 'kebab',
+      name: 'Snack Kebab Fantôme',
+      baseCost: 2500,
+      revenuePerSecond: 20,
+      description: 'Un restaurant qui n\'existe que sur papier',
+      emoji: '🥙'
+    },
+    {
       id: 'food_store',
       name: 'Magasin Alimentaire',
-      baseCost: 1200,
-      revenuePerSecond: 100,
+      baseCost: 10000,
+      revenuePerSecond: 75,
       description: 'Un supermarché qui déclare des ventes fictives',
       emoji: '🛒'
     },
     {
-      id: 'wizard_school',
-      name: 'École de Sorcier',
-      baseCost: 6000,
-      revenuePerSecond: 500,
-      description: 'Une école qui fait disparaître les traces comptables',
-      emoji: '🧙'
-    },
-    {
       id: 'garden_center',
       name: 'Jardinerie',
-      baseCost: 30000,
-      revenuePerSecond: 2500,
+      baseCost: 40000,
+      revenuePerSecond: 250,
       description: 'Une jardinerie qui cultive de l\'argent',
       emoji: '🌳'
     },
     {
+      id: 'laundromat',
+      name: 'Laverie automatique',
+      baseCost: 150000,
+      revenuePerSecond: 900,
+      description: 'Une laverie qui nettoie plus que les vêtements',
+      emoji: '🧺'
+    },
+    {
+      id: 'night_cleaning',
+      name: 'Entreprise de nettoyage nocturne',
+      baseCost: 600000,
+      revenuePerSecond: 3500,
+      description: 'Une entreprise qui nettoie les traces la nuit',
+      emoji: '🌙'
+    },
+    {
+      id: 'family_construction',
+      name: 'Entreprise de BTP "familiale"',
+      baseCost: 2500000,
+      revenuePerSecond: 15000,
+      description: 'Une entreprise familiale qui construit des comptes',
+      emoji: '🏗️'
+    },
+    {
+      id: 'cargo_port',
+      name: 'Port de Marchandise',
+      baseCost: 10000000,
+      revenuePerSecond: 70000,
+      description: 'Un port qui fait transiter de l\'argent',
+      emoji: '🚢'
+    },
+    {
       id: 'illegal_casino',
       name: 'Casino Ilégal',
-      baseCost: 150000,
-      revenuePerSecond: 12500,
+      baseCost: 50000000,
+      revenuePerSecond: 350000,
       description: 'Un casino souterrain qui génère des revenus non déclarés',
       emoji: '🎰'
+    },
+    {
+      id: 'strip_club',
+      name: 'Club Striptease',
+      baseCost: 200000000,
+      revenuePerSecond: 1200000,
+      description: 'Un club qui fait danser les comptes',
+      emoji: '💃'
+    },
+    {
+      id: 'crooked_lawyer',
+      name: 'Avocat Baveux',
+      baseCost: 1000000000,
+      revenuePerSecond: 5000000,
+      description: 'Un avocat qui fait disparaître les preuves',
+      emoji: '⚖️'
+    },
+    {
+      id: 'luxembourg_account',
+      name: 'Compte bancaire luxembourgeois',
+      baseCost: 5000000000,
+      revenuePerSecond: 25000000,
+      description: 'Un compte dans un paradis fiscal',
+      emoji: '🏦'
+    },
+    {
+      id: 'airline',
+      name: 'Compagnie aérienne',
+      baseCost: 25000000000,
+      revenuePerSecond: 120000000,
+      description: 'Une compagnie qui fait voler l\'argent',
+      emoji: '✈️'
+    },
+    {
+      id: 'gold_mine',
+      name: 'Mine d\'or',
+      baseCost: 150000000000,
+      revenuePerSecond: 800000000,
+      description: 'Une mine qui extrait de l\'or... et de l\'argent',
+      emoji: '⛏️'
+    },
+    {
+      id: 'paradise_island',
+      name: 'Ile Paradisiaque',
+      baseCost: 1000000000000,
+      revenuePerSecond: 6000000000,
+      description: 'Une île où l\'argent pousse sur les arbres',
+      emoji: '🏝️'
+    },
+    {
+      id: 'nft',
+      name: 'NFT sans image',
+      baseCost: 7000000000000,
+      revenuePerSecond: 45000000000,
+      description: 'Un NFT qui n\'existe que dans les comptes',
+      emoji: '🖼️'
+    },
+    {
+      id: 'crypto',
+      name: 'Crypto obscure',
+      baseCost: 50000000000000,
+      revenuePerSecond: 400000000000,
+      description: 'Une cryptomonnaie qui n\'existe nulle part',
+      emoji: '₿'
+    },
+    {
+      id: 'wizard_school',
+      name: 'École de Sorcier',
+      baseCost: 400000000000000,
+      revenuePerSecond: 4000000000000,
+      description: 'Une école qui fait disparaître les traces comptables',
+      emoji: '🧙'
     }
   ],
   
@@ -77,47 +182,6 @@ export const GAME_DATA = {
   FISCAL_AUDIT: {
     DURATION: 30000,
     RPS_PENALTY: 4
-  },
-  
-  MULTIPLIER_UPGRADES: [
-    {
-      id: 'tax_haven',
-      name: 'Paradis Fiscal',
-      baseCost: 300,
-      description: 'Multiplie par 2 le revenu passif total',
-      emoji: '🏝️',
-      type: 'rps_multiplier',
-      multiplier: 2
-    },
-    {
-      id: 'extra_bleach',
-      name: 'Lessive Extra-Blanche',
-      baseCost: 600,
-      description: 'Multiplie par 2 la valeur du clic manuel',
-      emoji: '✨',
-      type: 'click_multiplier',
-      multiplier: 2
-    },
-    {
-      id: 'illegal_loans',
-      name: 'Prêt Illégaux',
-      baseCost: 3000,
-      description: 'Prêts à taux usuraire. 50% chance de perdre 10% de votre argent, 50% chance de gagner un multiplicateur de peur (x1.5 RPS)',
-      emoji: '💰',
-      type: 'special_risk',
-      riskAmount: 0.10,
-      fearMultiplier: 1.5
-    },
-    {
-      id: 'crooked_lawyer',
-      name: 'Avocat Véreux',
-      baseCost: 9000,
-      description: 'Multiplie par 2.5 le revenu passif et réduit la suspicion actuelle de 30%',
-      emoji: '⚖️',
-      type: 'rps_multiplier',
-      multiplier: 2.5,
-      suspicionReduction: 0.3
-    }
-  ]
+  }
 }
 

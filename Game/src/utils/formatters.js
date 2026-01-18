@@ -15,10 +15,15 @@ export const formatNumber = (num) => {
   } else if (number >= 1000000) {
     return (number / 1000000).toFixed(2).replace('.', ',') + ' M'
   } else if (number >= 1000) {
-    return (number / 1000).toFixed(1).replace('.', ',') + ' K'
+    return (number / 1000).toFixed(2).replace('.', ',') + ' K'
   }
 
-  return Math.floor(number).toLocaleString('fr-FR') || '0'
+  // Afficher toujours au moins 1 décimale pour les petits nombres
+  if (number % 1 === 0) {
+    return number.toFixed(1).replace('.', ',')
+  } else {
+    return number.toFixed(2).replace('.', ',')
+  }
 }
 
 export const formatRevenue = (num) => {
@@ -33,13 +38,14 @@ export const formatRevenue = (num) => {
   } else if (number >= 1000000) {
     return (number / 1000000).toFixed(2).replace('.', ',') + ' M'
   } else if (number >= 1000) {
-    return (number / 1000).toFixed(1).replace('.', ',') + ' K'
+    return (number / 1000).toFixed(2).replace('.', ',') + ' K'
   }
 
+  // Afficher toujours au moins 1 décimale pour les petits nombres
   if (number % 1 === 0) {
-    return Math.floor(number).toString()
-  } else {
     return number.toFixed(1).replace('.', ',')
+  } else {
+    return number.toFixed(2).replace('.', ',')
   }
 }
 

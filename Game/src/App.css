@@ -5,20 +5,25 @@
 
 .app {
   min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* Header */
 .header {
   background: var(--bg-secondary);
-  padding: var(--spacing-md) var(--spacing-lg);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  padding: var(--spacing-sm) var(--spacing-md);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   border-bottom: 2px solid var(--accent-gold);
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--spacing-md);
+  gap: var(--spacing-sm);
   position: relative;
+  width: 100%;
+  max-width: 100%;
 }
 
 .header h1 {
@@ -78,27 +83,51 @@
 /* Conteneur principal */
 .game-container {
   display: flex;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-lg);
-  max-width: 1400px;
-  margin: 0 auto;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Section suspicion en haut */
+.suspicion-section {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  border-bottom: 2px solid var(--bg-tertiary);
+}
+
+/* Contenu du jeu en deux colonnes */
+.game-content {
+  display: flex;
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  border-top: 2px solid var(--bg-tertiary);
 }
 
 .click-zone {
-  flex: 0 0 60%;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  justify-content: center;
+  align-items: center;
+  border-right: 2px solid var(--bg-tertiary);
 }
 
 .upgrades-panel {
-  flex: 0 0 40%;
+  flex: 1;
   background: var(--bg-secondary);
-  border-radius: 20px;
-  padding: var(--spacing-md);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-  border: 2px solid var(--bg-tertiary);
-  max-height: calc(100vh - 200px);
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  border: none;
+  border-left: 2px solid var(--bg-tertiary);
+  max-height: calc(100vh - 150px);
   overflow-y: auto;
   overflow-x: visible;
   display: flex;
@@ -235,12 +264,13 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .game-container {
+  .game-content {
     flex-direction: column;
   }
   
   .click-zone {
     flex: 1;
+    min-height: 400px;
   }
   
   .upgrades-panel {

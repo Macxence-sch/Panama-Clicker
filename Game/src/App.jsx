@@ -4,7 +4,6 @@ import { Header } from './components/Header'
 import { Clicker } from './components/Clicker'
 import { SuspicionPanel } from './components/SuspicionPanel'
 import { UpgradesList } from './components/UpgradesList'
-import { MultiplierUpgrades } from './components/MultiplierUpgrades'
 import { Leaderboard } from './components/Leaderboard'
 import { PlayerNameModal } from './components/PlayerNameModal'
 import { storage } from './services/storage'
@@ -33,12 +32,6 @@ function App() {
     }
   }
 
-  const handleBuyMultiplierUpgrade = (upgradeId) => {
-    const result = gameState.buyMultiplierUpgrade(upgradeId)
-    if (result.message) {
-      showNotification(result.message, result.success ? 'success' : result.lostMoney ? 'error' : 'warning')
-    }
-  }
 
   const handleSubmitScore = (message, type) => {
     showNotification(message, type)
@@ -60,11 +53,7 @@ function App() {
       />
 
       <main className="game-container">
-        <section className="click-zone">
-          <Clicker
-            clickValue={gameState.getEffectiveClickValue()}
-            onClick={gameState.handleClick}
-          />
+        <section className="suspicion-section">
           <SuspicionPanel
             suspicion={gameState.suspicion}
             bribeCost={gameState.getBribeCost()}
@@ -79,22 +68,26 @@ function App() {
           />
         </section>
 
-        <section className="upgrades-panel">
-          <MultiplierUpgrades
-            ownedMultiplierUpgrades={gameState.ownedMultiplierUpgrades}
-            money={gameState.money}
-            onBuyMultiplierUpgrade={handleBuyMultiplierUpgrade}
-          />
-          <UpgradesList
-            ownedUpgrades={gameState.ownedUpgrades}
-            money={gameState.money}
-            getUpgradeCost={gameState.getUpgradeCost}
-            onBuyUpgrade={(id) => {
-              if (gameState.buyUpgrade(id)) {
-                showNotification('Achat réussi !', 'success')
-              }
-            }}
-          />
+        <section className="game-content">
+          <div className="click-zone">
+            <Clicker
+              clickValue={gameState.getEffectiveClickValue()}
+              onClick={gameState.handleClick}
+            />
+          </div>
+
+          <div className="upgrades-panel">
+            <UpgradesList
+              ownedUpgrades={gameState.ownedUpgrades}
+              money={gameState.money}
+              getUpgradeCost={gameState.getUpgradeCost}
+              onBuyUpgrade={(id) => {
+                if (gameState.buyUpgrade(id)) {
+                  showNotification('Achat réussi !', 'success')
+                }
+              }}
+            />
+          </div>
         </section>
       </main>
 

@@ -1,144 +1,246 @@
 /**
  * UpgradesList.css
+ * Style inspiré de Cookie Clicker
  */
 
 .investments-section {
-  margin-top: var(--spacing-md);
+  margin: 0;
+  padding: var(--spacing-sm);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .investments-section h2 {
   color: var(--accent-gold);
-  margin-bottom: var(--spacing-md);
-  font-size: 1.8rem;
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: 1.4rem;
   text-align: center;
   text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+  font-weight: bold;
+  padding: var(--spacing-xs) 0;
 }
 
 .upgrades-list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: 0;
 }
 
 .upgrade-item {
-  background: var(--bg-tertiary);
-  border-radius: 15px;
-  padding: var(--spacing-md);
-  border: 2px solid var(--bg-primary);
-  transition: all 0.3s ease;
-}
-
-.upgrade-item:hover {
-  border-color: var(--accent-gold);
-  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-  transform: translateY(-2px);
-}
-
-.upgrade-header {
+  background: linear-gradient(135deg, #6b4fa0 0%, #5a3f8f 100%);
+  border: 2px solid #4a2f6f;
+  border-bottom: 2px solid #3a2f5f;
+  border-radius: 4px;
+  padding: var(--spacing-sm) var(--spacing-md);
   display: flex;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
+  align-items: center;
+  gap: var(--spacing-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  margin-bottom: 2px;
 }
 
-.upgrade-emoji {
+.upgrade-item:last-child {
+  margin-bottom: 0;
+}
+
+.upgrade-item:hover:not(.disabled) {
+  background: linear-gradient(135deg, #7b5fb0 0%, #6a4f9f 100%);
+  border-color: #5a3f7f;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  border-bottom-color: #6a4f8f;
+}
+
+.upgrade-item:active:not(.disabled) {
+  transform: translateY(0);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+  border-top-color: #3a2f5f;
+  border-bottom-color: #5a3f7f;
+}
+
+.upgrade-item.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #4a3f6f 0%, #3a2f5f 100%);
+  border-color: #3a2f4f;
+  box-shadow: 
+    inset 0 1px 0 rgba(0, 0, 0, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.upgrade-item.disabled:hover {
+  transform: none;
+  background: linear-gradient(135deg, #4a3f6f 0%, #3a2f5f 100%);
+  box-shadow: 
+    inset 0 1px 0 rgba(0, 0, 0, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.upgrade-item.disabled .upgrade-quantity {
+  opacity: 1;
+}
+
+.upgrade-icon {
   font-size: 2.5rem;
   line-height: 1;
-}
-
-.upgrade-info {
-  flex: 1;
-}
-
-.upgrade-name {
-  font-size: 1.3rem;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-xs);
-}
-
-.upgrade-description {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  font-style: italic;
-}
-
-.upgrade-stats {
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
   display: flex;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-sm);
-  padding: var(--spacing-sm);
-  background: var(--bg-primary);
-  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  text-align: center;
 }
 
-.upgrade-stat {
+.upgrade-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  min-width: 0;
 }
 
-.stat-label {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-}
-
-.stat-value {
-  font-size: 1rem;
-  color: var(--accent-green);
-  font-weight: bold;
-}
-
-.upgrade-button {
-  width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
-  background: linear-gradient(135deg, var(--accent-gold) 0%, #b8941f 100%);
-  border: none;
-  border-radius: 10px;
-  color: var(--text-primary);
+.upgrade-name {
   font-size: 1.2rem;
   font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  color: #e8d5ff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  line-height: 1.2;
 }
 
-.upgrade-button:hover:not(.disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.6);
-  background: linear-gradient(135deg, #e4c047 0%, var(--accent-gold) 100%);
+.upgrade-cost {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
 }
 
-.upgrade-button:active:not(.disabled) {
-  transform: translateY(0);
+.cost-icon {
+  font-size: 1rem;
 }
 
-.upgrade-button.disabled {
-  background: var(--bg-primary);
-  color: var(--text-secondary);
-  cursor: not-allowed;
-  box-shadow: none;
-  opacity: 0.5;
+.cost-amount {
+  color: #ff6b9d;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-.button-cost {
+.upgrade-quantity {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #4a2f6f;
+  opacity: 0.7;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+  min-width: 80px;
+  text-align: right;
+  line-height: 1;
+}
+
+.upgrade-item.disabled .upgrade-quantity {
+  opacity: 0.9;
+  color: #5a3f7f;
+}
+
+/* Tooltip */
+.upgrade-tooltip {
+  position: fixed;
+  background: var(--bg-secondary);
+  border: 2px solid var(--accent-gold);
+  border-radius: 12px;
+  padding: var(--spacing-md);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  z-index: 10000;
+  min-width: 280px;
+  max-width: 350px;
+  transform: translateX(-50%) translateY(-100%);
+  pointer-events: auto;
+  margin-top: -10px;
+  animation: tooltip-fade-in 0.15s ease-out;
+}
+
+@keyframes tooltip-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-90%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-100%);
+  }
+}
+
+.tooltip-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.tooltip-emoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.tooltip-name {
   font-size: 1.3rem;
+  color: var(--accent-gold);
+  margin: 0;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
 }
 
-@keyframes purchase-flash {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
+.tooltip-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: var(--spacing-sm);
+  line-height: 1.4;
 }
 
-.upgrade-button.purchased {
-  background: linear-gradient(135deg, var(--accent-green) 0%, #00b894 100%);
-  animation: purchase-flash 0.3s ease;
+.tooltip-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--bg-tertiary);
+}
+
+.tooltip-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.tooltip-stat .stat-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.tooltip-stat .stat-value {
+  font-size: 0.95rem;
+  color: var(--accent-green);
+  font-weight: bold;
 }
 

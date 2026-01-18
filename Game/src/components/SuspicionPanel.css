@@ -4,29 +4,39 @@
 
 .suspicion-panel {
   background: var(--bg-secondary);
-  border-radius: 15px;
-  padding: var(--spacing-md);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  border: 2px solid var(--bg-tertiary);
+  border-radius: 0;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  box-shadow: none;
+  border: none;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
+  width: 100%;
+}
+
+.suspicion-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
 }
 
 .suspicion-panel h3 {
   color: var(--accent-silver);
-  margin-bottom: var(--spacing-sm);
-  font-size: 1.1rem;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1.4;
 }
 
 .suspicion-bar-container {
   width: 100%;
-  height: 30px;
+  height: 20px;
   background: var(--bg-tertiary);
-  border-radius: 15px;
+  border-radius: 0;
   overflow: hidden;
   position: relative;
-  border: 2px solid var(--bg-primary);
+  border: 1px solid var(--bg-primary);
 }
 
 .suspicion-bar {
@@ -68,54 +78,46 @@
 }
 
 .bribe-button {
-  width: 100%;
-  padding: var(--spacing-sm);
+  padding: 0.3rem 0.6rem;
   background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
-  border: none;
-  border-radius: 10px;
+  border: 1px solid #654321;
+  border-radius: 4px;
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: bold;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1.2;
 }
 
 .bribe-button:hover:not(.disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.6);
   background: linear-gradient(135deg, #a0522d 0%, #8b4513 100%);
+  border-color: #8b4513;
 }
 
 .bribe-button:active:not(.disabled) {
-  transform: translateY(0);
+  transform: scale(0.95);
 }
 
 .bribe-button.disabled {
   background: var(--bg-primary);
   color: var(--text-secondary);
   cursor: not-allowed;
-  box-shadow: none;
   opacity: 0.5;
-}
-
-.bribe-button small {
-  display: block;
-  font-size: 0.8rem;
-  margin-top: 0.25rem;
-  font-weight: normal;
+  border-color: var(--bg-tertiary);
 }
 
 .fiscal-audit-warning {
   background: var(--accent-red);
   color: var(--text-primary);
-  padding: var(--spacing-sm);
-  border-radius: 10px;
+  padding: 0.25rem var(--spacing-xs);
+  border-radius: 0;
   text-align: center;
   font-weight: bold;
-  margin-top: var(--spacing-sm);
+  font-size: 0.8rem;
+  margin-top: var(--spacing-xs);
   animation: pulse-alert 1s infinite;
 }
 

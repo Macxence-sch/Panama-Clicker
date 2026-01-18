@@ -10,6 +10,8 @@ export const Header = ({ money, revenuePerSecond, renaissanceCount, renaissanceB
       <button 
         className="reset-button"
         onClick={onRenaissance}
+        disabled
+        style={{ opacity: 0.5, cursor: 'not-allowed' }}
       >
         🔄 Renaissance (x{nextBoost.toFixed(2)})
       </button>

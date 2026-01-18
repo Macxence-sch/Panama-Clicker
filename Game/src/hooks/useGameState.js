@@ -16,18 +16,6 @@ export const useGameState = () => {
     })
     return initial
   })
-  const [ownedMultiplierUpgrades, setOwnedMultiplierUpgrades] = useState(() => {
-    const initial = {}
-    GAME_DATA.MULTIPLIER_UPGRADES.forEach(upgrade => {
-      initial[upgrade.id] = false
-    })
-    return initial
-  })
-
-  // Multiplicateurs
-  const [rpsMultiplier, setRpsMultiplier] = useState(1)
-  const [clickMultiplier, setClickMultiplier] = useState(1)
-  const [fearMultiplier, setFearMultiplier] = useState(1)
 
   // Suspicion et contrôle fiscal
   const [suspicion, setSuspicion] = useState(0)
@@ -38,8 +26,11 @@ export const useGameState = () => {
   const [renaissanceCount, setRenaissanceCount] = useState(0)
   const renaissanceBoost = 1.05
 
-  // Refs pour les valeurs qui ne doivent pas déclencher de re-render
-  const multipliersRef = useRef({ rps: 1, click: 1, fear: 1 })
+  // Protection contre les autoclickers
+  const lastClickTime = useRef(0)
+  const clickHistory = useRef([])
+  const MIN_CLICK_INTERVAL = 50 // Minimum 50ms entre les clics (20 clics/seconde max)
+  const MAX_CLICKS_PER_SECOND = 15 // Maximum 15 clics par seconde
 
   /**
    * Recalcule le revenu par seconde
@@ -50,14 +41,16 @@ export const useGameState = () => {
     GAME_DATA.UPGRADES.forEach(upgrade => {
       const quantity = ownedUpgrades[upgrade.id] || 0
       if (quantity > 0 && upgrade.revenuePerSecond) {
-        rps += upgrade.revenuePerSecond * quantity
+        // Calculer le revenu avec augmentation de 5% par possession
+        // Le premier rapporte 100%, le deuxième 105%, le troisième 110.25%, etc.
+        let totalRevenue = 0
+        for (let i = 0; i < quantity; i++) {
+          const multiplier = Math.pow(1.05, i) // 1.05^0 = 1, 1.05^1 = 1.05, 1.05^2 = 1.1025, etc.
+          totalRevenue += upgrade.revenuePerSecond * multiplier
+        }
+        rps += totalRevenue
       }
     })
-
-    // Appliquer les multiplicateurs
-    const rpsMult = multipliersRef.current.rps || 1
-    const fearMult = multipliersRef.current.fear || 1
-    rps *= rpsMult * fearMult
 
     // Appliquer le boost de renaissance
     if (renaissanceCount > 0) {
@@ -81,8 +74,26 @@ export const useGameState = () => {
    * Calcule la valeur effective d'un clic
    */
   const getEffectiveClickValue = useCallback(() => {
-    let clickValue = GAME_DATA.BASE_CLICK_VALUE * multipliersRef.current.click
+    let clickValue = GAME_DATA.BASE_CLICK_VALUE
 
+    // Ajouter les upgrades de clic (Taille Machine) avec augmentation de 5% par possession
+    GAME_DATA.UPGRADES.forEach(upgrade => {
+      if (upgrade.type === 'click_upgrade' && upgrade.clickValueIncrease) {
+        const quantity = ownedUpgrades[upgrade.id] || 0
+        if (quantity > 0) {
+          // Calculer la valeur du clic avec augmentation de 5% par possession
+          // Le premier ajoute 100%, le deuxième 105%, le troisième 110.25%, etc.
+          let totalClickIncrease = 0
+          for (let i = 0; i < quantity; i++) {
+            const multiplier = Math.pow(1.05, i) // 1.05^0 = 1, 1.05^1 = 1.05, 1.05^2 = 1.1025, etc.
+            totalClickIncrease += upgrade.clickValueIncrease * multiplier
+          }
+          clickValue += totalClickIncrease
+        }
+      }
+    })
+
+    // Appliquer le boost de renaissance
     if (renaissanceCount > 0) {
       clickValue *= Math.pow(renaissanceBoost, renaissanceCount)
     }
@@ -90,7 +101,7 @@ export const useGameState = () => {
     return isNaN(clickValue) || !isFinite(clickValue) 
       ? GAME_DATA.BASE_CLICK_VALUE 
       : clickValue
-  }, [renaissanceCount, renaissanceBoost])
+  }, [ownedUpgrades, renaissanceCount, renaissanceBoost])
 
   /**
    * Calcule le coût d'une amélioration
@@ -103,7 +114,7 @@ export const useGameState = () => {
     if (isNaN(quantity) || quantity < 0) return upgrade.baseCost
 
     const cost = upgrade.baseCost * Math.pow(GAME_DATA.COST_MULTIPLIER, quantity)
-    return Math.floor(isNaN(cost) ? upgrade.baseCost : cost)
+    return isNaN(cost) ? upgrade.baseCost : cost
   }, [ownedUpgrades])
 
   /**
@@ -113,80 +124,77 @@ export const useGameState = () => {
     const cost = getUpgradeCost(upgradeId)
     if (money >= cost) {
       setMoney(prev => prev - cost)
-      setOwnedUpgrades(prev => ({
-        ...prev,
-        [upgradeId]: (prev[upgradeId] || 0) + 1
-      }))
+      setOwnedUpgrades(prev => {
+        const updated = {}
+        
+        // D'abord, initialiser tous les upgrades depuis GAME_DATA
+        GAME_DATA.UPGRADES.forEach(upgrade => {
+          updated[upgrade.id] = prev[upgrade.id] || 0
+        })
+        
+        // Ensuite, copier toutes les valeurs de prev (au cas où il y aurait des upgrades supplémentaires)
+        Object.keys(prev).forEach(key => {
+          if (!updated.hasOwnProperty(key)) {
+            updated[key] = prev[key]
+          }
+        })
+        
+        // Mettre à jour l'upgrade acheté
+        updated[upgradeId] = (updated[upgradeId] || 0) + 1
+        
+        // Debug: vérifier que machine_size est présent après l'achat
+        if (import.meta.env.DEV) {
+          console.log('Après achat - machine_size:', updated.machine_size)
+          console.log('Après achat - upgradeId acheté:', upgradeId)
+        }
+        
+        return updated
+      })
       return true
     }
     return false
   }, [money, getUpgradeCost])
 
-  /**
-   * Achete un upgrade multiplicateur
-   */
-  const buyMultiplierUpgrade = useCallback((upgradeId) => {
-    const upgrade = GAME_DATA.MULTIPLIER_UPGRADES.find(u => u.id === upgradeId)
-    if (!upgrade) {
-      return { success: false, message: 'N\'existe pas' }
-    }
-
-    if (upgrade.type !== 'special_risk' && ownedMultiplierUpgrades[upgradeId]) {
-      return { success: false, message: 'Déjà possédé' }
-    }
-
-    if (money < upgrade.baseCost) {
-      return { success: false, message: 'Pas assez d\'argent' }
-    }
-
-    setMoney(prev => prev - upgrade.baseCost)
-
-    // Gérer les upgrades spéciaux avec risque
-    if (upgrade.type === 'special_risk') {
-      const success = Math.random() < 0.5
-
-      if (success) {
-        setFearMultiplier(prev => prev * upgrade.fearMultiplier)
-        multipliersRef.current.fear *= upgrade.fearMultiplier
-        setOwnedMultiplierUpgrades(prev => ({ ...prev, [upgradeId]: true }))
-        return {
-          success: true,
-          message: `Succès ! Multiplicateur de peur x${upgrade.fearMultiplier} obtenu !`,
-          gainedMultiplier: true
-        }
-      } else {
-        const lostAmount = Math.floor(money * upgrade.riskAmount)
-        setMoney(prev => Math.max(0, prev - lostAmount))
-        return {
-          success: false,
-          message: `Échec ! Vous avez perdu ${lostAmount}€. Le débiteur a disparu...`,
-          lostMoney: lostAmount
-        }
-      }
-    }
-
-    // Upgrade normal
-    setOwnedMultiplierUpgrades(prev => ({ ...prev, [upgradeId]: true }))
-
-    if (upgrade.type === 'rps_multiplier') {
-      setRpsMultiplier(prev => prev * upgrade.multiplier)
-      multipliersRef.current.rps *= upgrade.multiplier
-
-      if (upgrade.suspicionReduction) {
-        setSuspicion(prev => prev * (1 - upgrade.suspicionReduction))
-      }
-    } else if (upgrade.type === 'click_multiplier') {
-      setClickMultiplier(prev => prev * upgrade.multiplier)
-      multipliersRef.current.click *= upgrade.multiplier
-    }
-
-    return { success: true, message: 'Achat réussi !' }
-  }, [money, ownedMultiplierUpgrades])
 
   /**
    * Gère un clic
    */
   const handleClick = useCallback(() => {
+    const now = Date.now()
+    const timeSinceLastClick = now - lastClickTime.current
+    
+    // Vérifier l'intervalle minimum entre les clics
+    if (timeSinceLastClick < MIN_CLICK_INTERVAL) {
+      return // Ignorer le clic si trop rapide
+    }
+    
+    // Nettoyer l'historique des clics (garder seulement les 2 dernières secondes)
+    clickHistory.current = clickHistory.current.filter(clickTime => now - clickTime < 2000)
+    
+    // Vérifier le nombre de clics par seconde
+    const clicksInLastSecond = clickHistory.current.filter(clickTime => now - clickTime < 1000).length
+    if (clicksInLastSecond >= MAX_CLICKS_PER_SECOND) {
+      return // Ignorer le clic si trop de clics dans la dernière seconde
+    }
+    
+    // Vérifier si les clics sont trop réguliers (signe d'autoclicker)
+    if (clickHistory.current.length >= 5) {
+      const intervals = []
+      for (let i = 1; i < clickHistory.current.length; i++) {
+        intervals.push(clickHistory.current[i] - clickHistory.current[i - 1])
+      }
+      // Si tous les intervalles sont identiques à ±5ms, c'est suspect
+      const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length
+      const allSimilar = intervals.every(interval => Math.abs(interval - avgInterval) < 5)
+      if (allSimilar && avgInterval < 100) {
+        return // Ignorer si les clics sont trop réguliers et rapides
+      }
+    }
+    
+    // Enregistrer le clic
+    lastClickTime.current = now
+    clickHistory.current.push(now)
+    
     const clickValue = getEffectiveClickValue()
     setMoney(prev => prev + clickValue)
   }, [getEffectiveClickValue])
@@ -197,7 +205,7 @@ export const useGameState = () => {
   const bribeInspector = useCallback(() => {
     const bribeCost = Math.max(
       GAME_DATA.SUSPICION.BRIBE_MIN_COST,
-      Math.floor(money * GAME_DATA.SUSPICION.BRIBE_COST_PERCENTAGE)
+      money * GAME_DATA.SUSPICION.BRIBE_COST_PERCENTAGE
     )
 
     if (money >= bribeCost) {
@@ -214,7 +222,7 @@ export const useGameState = () => {
   const getBribeCost = useCallback(() => {
     return Math.max(
       GAME_DATA.SUSPICION.BRIBE_MIN_COST,
-      Math.floor(money * GAME_DATA.SUSPICION.BRIBE_COST_PERCENTAGE)
+      money * GAME_DATA.SUSPICION.BRIBE_COST_PERCENTAGE
     )
   }, [money])
 
@@ -231,40 +239,48 @@ export const useGameState = () => {
       })
       return initial
     })
-    setOwnedMultiplierUpgrades(() => {
-      const initial = {}
-      GAME_DATA.MULTIPLIER_UPGRADES.forEach(upgrade => {
-        initial[upgrade.id] = false
-      })
-      return initial
-    })
     setSuspicion(0)
     setIsFiscalAudit(false)
     setFiscalAuditEndTime(0)
-    setRpsMultiplier(1)
-    setClickMultiplier(1)
-    setFearMultiplier(1)
-    multipliersRef.current = { rps: 1, click: 1, fear: 1 }
   }, [])
 
   /**
    * Sauvegarde l'état
    */
   const save = useCallback(() => {
+    // S'assurer que tous les upgrades sont présents dans ownedUpgrades avant de sauvegarder
+    const completeUpgrades = { ...ownedUpgrades }
+    GAME_DATA.UPGRADES.forEach(upgrade => {
+      if (completeUpgrades[upgrade.id] === undefined) {
+        completeUpgrades[upgrade.id] = 0
+      }
+    })
+    
     const saveData = {
       money,
-      ownedUpgrades,
-      ownedMultiplierUpgrades,
+      ownedUpgrades: completeUpgrades,
       suspicion,
-      rpsMultiplier,
-      clickMultiplier,
-      fearMultiplier,
       isFiscalAudit,
       fiscalAuditEndTime,
       renaissanceCount
     }
+    
+    // Debug: vérifier que machine_size est présent
+    console.log('=== SAUVEGARDE ===')
+    console.log('machine_size présent:', completeUpgrades.hasOwnProperty('machine_size'))
+    console.log('machine_size valeur:', completeUpgrades.machine_size)
+    console.log('Tous les IDs d\'upgrades:', Object.keys(completeUpgrades))
+    console.log('IDs attendus:', GAME_DATA.UPGRADES.map(u => u.id))
+    console.log('machine_size dans GAME_DATA:', GAME_DATA.UPGRADES.find(u => u.id === 'machine_size'))
+    console.log('Données complètes à sauvegarder:', saveData)
+    
     storage.save(saveData)
-  }, [money, ownedUpgrades, ownedMultiplierUpgrades, suspicion, rpsMultiplier, clickMultiplier, fearMultiplier, isFiscalAudit, fiscalAuditEndTime, renaissanceCount])
+    
+    // Vérifier ce qui a été réellement sauvegardé
+    const saved = storage.load()
+    console.log('Vérification après sauvegarde - machine_size:', saved?.ownedUpgrades?.machine_size)
+    console.log('Vérification après sauvegarde - tous les IDs:', Object.keys(saved?.ownedUpgrades || {}))
+  }, [money, ownedUpgrades, suspicion, isFiscalAudit, fiscalAuditEndTime, renaissanceCount])
 
   /**
    * Charge l'état
@@ -274,34 +290,54 @@ export const useGameState = () => {
     if (!savedData) return
 
     setMoney(savedData.money || 0)
-    setOwnedUpgrades(savedData.ownedUpgrades || {})
-    setOwnedMultiplierUpgrades(savedData.ownedMultiplierUpgrades || {})
-    setSuspicion(Math.max(0, Math.min(100, savedData.suspicion || 0)))
-    setRenaissanceCount(Math.max(0, savedData.renaissanceCount || 0))
-    setRpsMultiplier(savedData.rpsMultiplier || 1)
-    setClickMultiplier(savedData.clickMultiplier || 1)
-    setFearMultiplier(savedData.fearMultiplier || 1)
-    setIsFiscalAudit(savedData.isFiscalAudit || false)
-    setFiscalAuditEndTime(savedData.fiscalAuditEndTime || 0)
-
-    // Réappliquer les multiplicateurs depuis les upgrades possédés
-    let rpsMult = 1
-    let clickMult = 1
-    let fearMult = savedData.fearMultiplier || 1
-
-    GAME_DATA.MULTIPLIER_UPGRADES.forEach(upgrade => {
-      if (savedData.ownedMultiplierUpgrades?.[upgrade.id] && upgrade.multiplier) {
-        if (upgrade.type === 'rps_multiplier') {
-          rpsMult *= upgrade.multiplier
-        } else if (upgrade.type === 'click_multiplier') {
-          clickMult *= upgrade.multiplier
-        }
+    
+    // S'assurer que tous les upgrades sont initialisés, y compris les nouveaux
+    const loadedUpgrades = savedData.ownedUpgrades || {}
+    const completeUpgrades = {}
+    
+    // Initialiser tous les upgrades depuis GAME_DATA
+    GAME_DATA.UPGRADES.forEach(upgrade => {
+      // Si l'upgrade existe dans les données sauvegardées, utiliser sa valeur, sinon 0
+      if (loadedUpgrades.hasOwnProperty(upgrade.id)) {
+        completeUpgrades[upgrade.id] = loadedUpgrades[upgrade.id]
+      } else {
+        completeUpgrades[upgrade.id] = 0
       }
     })
-
-    setRpsMultiplier(rpsMult)
-    setClickMultiplier(clickMult)
-    multipliersRef.current = { rps: rpsMult, click: clickMult, fear: fearMult }
+    
+    // Migration: s'assurer que machine_size existe (pour les anciennes sauvegardes)
+    if (!completeUpgrades.hasOwnProperty('machine_size')) {
+      completeUpgrades.machine_size = 0
+    }
+    
+    console.log('=== CHARGEMENT ===')
+    console.log('machine_size après migration:', completeUpgrades.machine_size)
+    console.log('Tous les IDs après migration:', Object.keys(completeUpgrades))
+    console.log('IDs attendus:', GAME_DATA.UPGRADES.map(u => u.id))
+    console.log('machine_size dans GAME_DATA:', GAME_DATA.UPGRADES.find(u => u.id === 'machine_size'))
+    
+    setOwnedUpgrades(completeUpgrades)
+    
+    // Sauvegarder immédiatement pour migrer les anciennes sauvegardes
+    const saveData = {
+      money: savedData.money || 0,
+      ownedUpgrades: completeUpgrades,
+      suspicion: Math.max(0, Math.min(100, savedData.suspicion || 0)),
+      isFiscalAudit: savedData.isFiscalAudit || false,
+      fiscalAuditEndTime: savedData.fiscalAuditEndTime || 0,
+      renaissanceCount: Math.max(0, savedData.renaissanceCount || 0)
+    }
+    storage.save(saveData)
+    
+    // Vérifier ce qui a été réellement sauvegardé
+    const saved = storage.load()
+    console.log('Vérification après migration - machine_size:', saved?.ownedUpgrades?.machine_size)
+    console.log('Vérification après migration - tous les IDs:', Object.keys(saved?.ownedUpgrades || {}))
+    
+    setSuspicion(Math.max(0, Math.min(100, savedData.suspicion || 0)))
+    setRenaissanceCount(Math.max(0, savedData.renaissanceCount || 0))
+    setIsFiscalAudit(savedData.isFiscalAudit || false)
+    setFiscalAuditEndTime(savedData.fiscalAuditEndTime || 0)
   }, [])
 
   // Charger au montage
@@ -374,7 +410,6 @@ export const useGameState = () => {
     money,
     totalRevenuePerSecond,
     ownedUpgrades,
-    ownedMultiplierUpgrades,
     suspicion,
     isFiscalAudit,
     fiscalAuditEndTime,
@@ -390,7 +425,6 @@ export const useGameState = () => {
     // Actions
     handleClick,
     buyUpgrade,
-    buyMultiplierUpgrade,
     bribeInspector,
     performRenaissance,
     save,
