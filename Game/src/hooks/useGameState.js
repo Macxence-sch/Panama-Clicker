@@ -245,6 +245,55 @@ export const useGameState = () => {
   }, [])
 
   /**
+   * Remet tout à zéro et sauvegarde immédiatement
+   */
+  const resetEverything = useCallback(() => {
+    console.log('🔄 Début de la réinitialisation complète...')
+    
+    // Créer les données de reset avec tous les upgrades initialisés
+    const initialUpgrades = {}
+    GAME_DATA.UPGRADES.forEach(upgrade => {
+      initialUpgrades[upgrade.id] = 0
+    })
+    
+    const resetData = {
+      money: 0,
+      ownedUpgrades: initialUpgrades,
+      suspicion: 0,
+      isFiscalAudit: false,
+      fiscalAuditEndTime: 0,
+      renaissanceCount: 0
+    }
+    
+    console.log('💾 Données de reset préparées:', resetData)
+    console.log('💾 machine_size dans resetData:', resetData.ownedUpgrades.machine_size)
+    
+    // Sauvegarder AVANT de changer les états pour être sûr
+    const saveResult = storage.save(resetData)
+    console.log('💾 Résultat de la sauvegarde:', saveResult)
+    
+    // Vérifier que la sauvegarde a bien fonctionné
+    const saved = storage.load()
+    if (saved) {
+      console.log('✅ Vérification - Données sauvegardées:', saved)
+      console.log('✅ Vérification - machine_size:', saved.ownedUpgrades?.machine_size)
+    } else {
+      console.error('❌ ERREUR: Aucune donnée trouvée après sauvegarde!')
+    }
+    
+    // Réinitialiser tous les états APRÈS la sauvegarde
+    setMoney(0)
+    setTotalRevenuePerSecond(0)
+    setOwnedUpgrades(initialUpgrades)
+    setSuspicion(0)
+    setIsFiscalAudit(false)
+    setFiscalAuditEndTime(0)
+    setRenaissanceCount(0)
+    
+    console.log('✅ États réinitialisés')
+  }, [])
+
+  /**
    * Sauvegarde l'état
    */
   const save = useCallback(() => {
@@ -461,6 +510,7 @@ export const useGameState = () => {
     buyUpgrade,
     bribeInspector,
     performRenaissance,
+    resetEverything,
     save,
     load
   }

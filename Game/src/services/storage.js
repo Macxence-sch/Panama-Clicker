@@ -94,12 +94,29 @@ export const storage = {
    */
   clear: () => {
     try {
+      // Vérifier que localStorage est disponible
+      if (typeof localStorage === 'undefined') {
+        console.error('localStorage n\'est pas disponible')
+        return false
+      }
+      
+      // Vérifier si on peut accéder au localStorage
+      try {
+        localStorage.setItem('test_access', 'test')
+        localStorage.removeItem('test_access')
+      } catch (testError) {
+        console.error('Impossible d\'accéder au localStorage:', testError.name)
+        return false
+      }
+      
       localStorage.removeItem(STORAGE_KEY)
       localStorage.removeItem(PLAYER_NAME_KEY)
       console.log('LocalStorage réinitialisé')
       return true
     } catch (error) {
       console.error('Erreur lors de la réinitialisation:', error)
+      console.error('Type d\'erreur:', error.name)
+      console.error('Message:', error.message)
       return false
     }
   },
@@ -109,11 +126,38 @@ export const storage = {
    */
   clearGameData: () => {
     try {
+      // Vérifier que localStorage est disponible
+      if (typeof localStorage === 'undefined') {
+        console.error('localStorage n\'est pas disponible')
+        return false
+      }
+      
       localStorage.removeItem(STORAGE_KEY)
       console.log('Données de jeu réinitialisées')
       return true
     } catch (error) {
       console.error('Erreur lors de la réinitialisation des données de jeu:', error)
+      console.error('Type d\'erreur:', error.name)
+      return false
+    }
+  },
+
+  /**
+   * Vérifie si le localStorage est disponible et fonctionnel
+   */
+  isAvailable: () => {
+    try {
+      if (typeof localStorage === 'undefined') {
+        return false
+      }
+      
+      // Tester l'écriture/lecture
+      const testKey = '__storage_test__'
+      localStorage.setItem(testKey, 'test')
+      const result = localStorage.getItem(testKey) === 'test'
+      localStorage.removeItem(testKey)
+      return result
+    } catch (e) {
       return false
     }
   }

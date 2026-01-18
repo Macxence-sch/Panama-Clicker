@@ -87,6 +87,14 @@ function App() {
     setTimeout(() => setNotification(null), 3000)
   }
 
+  // Vérifier la disponibilité du localStorage au démarrage
+  useEffect(() => {
+    if (!storage.isAvailable()) {
+      console.warn('⚠️ localStorage n\'est pas disponible. La sauvegarde ne fonctionnera pas.')
+      showNotification('⚠️ localStorage indisponible - La sauvegarde ne fonctionnera pas. Vérifiez vos paramètres de confidentialité.', 'error')
+    }
+  }, [])
+
   const handleRenaissance = () => {
     const currentBoost = Math.pow(gameState.renaissanceBoost, gameState.renaissanceCount)
     const nextBoost = Math.pow(gameState.renaissanceBoost, gameState.renaissanceCount + 1)
@@ -105,8 +113,46 @@ function App() {
 
   const handleResetStorage = () => {
     if (window.confirm('Voulez-vous vraiment réinitialiser toutes les données sauvegardées ? Cette action est irréversible.')) {
-      storage.clear()
-      window.location.reload()
+      try {
+        // Utiliser la fonction resetEverything qui remet tout à zéro ET sauvegarde
+        gameState.resetEverything()
+        
+        // Vérifier que la sauvegarde a bien fonctionné avant de recharger
+        setTimeout(() => {
+          const saved = storage.load()
+          if (saved && saved.money === 0) {
+            console.log('✅ Sauvegarde vérifiée, rechargement de la page...')
+            showNotification('Jeu réinitialisé et sauvegardé !', 'success')
+            setTimeout(() => {
+              window.location.reload()
+            }, 1000)
+          } else {
+            console.error('❌ La sauvegarde n\'a pas fonctionné, nouvelle tentative...')
+            // Réessayer la sauvegarde
+            const resetData = {
+              money: 0,
+              ownedUpgrades: (() => {
+                const initial = {}
+                GAME_DATA.UPGRADES.forEach(upgrade => {
+                  initial[upgrade.id] = 0
+                })
+                return initial
+              })(),
+              suspicion: 0,
+              isFiscalAudit: false,
+              fiscalAuditEndTime: 0,
+              renaissanceCount: 0
+            }
+            storage.save(resetData)
+            setTimeout(() => {
+              window.location.reload()
+            }, 500)
+          }
+        }, 300)
+      } catch (error) {
+        console.error('Erreur lors du reset:', error)
+        alert(`Erreur: ${error.message}. Essayez de vider le localStorage manuellement via la console (F12) : localStorage.clear()`)
+      }
     }
   }
 
@@ -123,6 +169,7 @@ function App() {
         renaissanceCount={gameState.renaissanceCount}
         renaissanceBoost={gameState.renaissanceBoost}
         onRenaissance={handleRenaissance}
+        onResetStorage={handleResetStorage}
       />
 
       <main className="game-container">
@@ -169,27 +216,6 @@ function App() {
         onClick={() => setShowLeaderboard(true)}
       >
         🏆
-      </button>
-
-      <button
-        className="reset-storage-button"
-        onClick={handleResetStorage}
-        title="Réinitialiser le localStorage"
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          padding: '10px 15px',
-          backgroundColor: '#8b0000',
-          color: 'white',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-          fontSize: '0.9rem',
-          zIndex: 1000
-        }}
-      >
-        🗑️ Reset Storage
       </button>
 
       <Leaderboard
